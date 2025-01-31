@@ -75,6 +75,9 @@
     .nav-bar button:hover {
       background-color: #16a085;
     }
+    .nav-bar button:focus {
+      outline: none;
+    }
     #errorMessage {
       color: red;
       display: none;
@@ -84,6 +87,9 @@
     }
     #withdrawButton {
       margin-top: 20px;
+    }
+    #referralLink {
+      display: none;
     }
   </style>
 </head>
@@ -98,7 +104,7 @@
 
   <div id="referralSystem" style="display:none;">
     <h3>Your Referral Link:</h3>
-    <p id="referralLink"></p>
+    <p id="referralLink">https://yourapp.com/?ref=USER12345</p>
     <button class="button" onclick="copyReferralLink()">Copy Referral Link</button>
     <h3>Referral Bonus</h3>
     <p>If someone uses your referral link, you'll earn <strong>50 points</strong>.</p>

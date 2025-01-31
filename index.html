@@ -131,6 +131,7 @@
     <h3>Spin for NL Coin</h3>
     <button class="button" id="spinButton" onclick="spin()">Spin</button>
     <p id="spinResult"></p>
+    <p id="spinCounter">Remaining Spins This Minute: 20</p>
   </div>
 
   <div class="nav-bar">
@@ -144,10 +145,15 @@
   <script>
     let nlCoin = localStorage.getItem('nlCoin') ? parseInt(localStorage.getItem('nlCoin')) : 0;
     let referralBonus = 50;
-    let isWalletConnected = false; 
+    let isWalletConnected = false;
     let userId = "USER" + Math.floor(Math.random() * 100000);
     let referralLink = `https://yourapp.com/?ref=${userId}`;
     document.getElementById('referralLink').innerText = referralLink;
+
+    // Spin-related variables
+    let spinCount = 0;
+    const maxSpinsPerMinute = 20;
+    let spinCooldown = 60;  // 60 seconds cooldown for spins
 
     // Update the NL Coin display
     function updateCoinDisplay() {
@@ -155,11 +161,13 @@
       localStorage.setItem('nlCoin', nlCoin);  // Save NL Coin to localStorage
     }
 
+    // Tap button to earn coins
     function tapButton() {
       nlCoin++;
       updateCoinDisplay();
     }
 
+    // Copy referral link to clipboard
     function copyReferralLink() {
       navigator.clipboard.writeText(referralLink).then(function() {
         alert('Referral link copied to clipboard!');
@@ -168,12 +176,14 @@
       });
     }
 
+    // Connect wallet
     function connectWallet() {
       isWalletConnected = true;
       alert('Wallet connected!');
       document.getElementById('withdrawButton').disabled = false;
     }
 
+    // Withdraw NL Coin
     function withdrawPoints() {
       if (isWalletConnected) {
         alert(`You have successfully withdrawn ${nlCoin} NL Coin!`);
@@ -184,14 +194,29 @@
       }
     }
 
+    // Spin function
     function spin() {
+      if (spinCount >= maxSpinsPerMinute) {
+        alert('You have reached the maximum number of spins for this minute.');
+        return;
+      }
+
       let randomCoin = Math.random() < 0.5 ? 10000 : 0;  // 50% chance to win 10000 NL Coin
       nlCoin += randomCoin;
       document.getElementById('spinResult').innerText = randomCoin === 10000 ? "You won 10000 NL Coin!" : "You won 0 NL Coin!";
       updateCoinDisplay();
-      setTimeout(() => document.getElementById('spinResult').innerText = '', 3000); // Reset after 3 seconds
+
+      spinCount++;
+      document.getElementById('spinCounter').innerText = `Remaining Spins This Minute: ${maxSpinsPerMinute - spinCount}`;
+
+      // Reset spin count every minute
+      setTimeout(() => {
+        spinCount = 0;
+        document.getElementById('spinCounter').innerText = `Remaining Spins This Minute: ${maxSpinsPerMinute}`;
+      }, spinCooldown * 1000);
     }
 
+    // Show home screen
     function showHome() {
       document.getElementById('referralSystem').style.display = 'none';
       document.getElementById('walletConnect').style.display = 'none';
@@ -200,6 +225,7 @@
       document.querySelector('button[onclick="tapButton()"]').style.display = 'inline-block';
     }
 
+    // Show referral system
     function showReferralSystem() {
       document.getElementById('referralSystem').style.display = 'block';
       document.getElementById('walletConnect').style.display = 'none';
@@ -208,6 +234,7 @@
       document.querySelector('button[onclick="tapButton()"]').style.display = 'none';
     }
 
+    // Show wallet connect
     function showWalletConnect() {
       document.getElementById('referralSystem').style.display = 'none';
       document.getElementById('walletConnect').style.display = 'block';
@@ -216,6 +243,7 @@
       document.querySelector('button[onclick="tapButton()"]').style.display = 'none';
     }
 
+    // Show airdrop
     function showAirdrop() {
       document.getElementById('referralSystem').style.display = 'none';
       document.getElementById('walletConnect').style.display = 'none';
@@ -224,6 +252,7 @@
       document.querySelector('button[onclick="tapButton()"]').style.display = 'none';
     }
 
+    // Show spin system
     function showSpinSystem() {
       document.getElementById('referralSystem').style.display = 'none';
       document.getElementById('walletConnect').style.display = 'none';

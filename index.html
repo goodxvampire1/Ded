@@ -26,6 +26,25 @@
       background-color: #ccc;
       cursor: not-allowed;
     }
+    .nav-bar {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      background-color: #333;
+      padding: 10px 0;
+    }
+    .nav-bar button {
+      background-color: #555;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+    .nav-bar button:hover {
+      background-color: #777;
+    }
   </style>
 </head>
 <body>
@@ -35,47 +54,49 @@
 
   <p id="points">Points: 0</p>
 
-  <h3>Your Referral Link:</h3>
-  <p id="referralLink"></p>
-  <button class="button" onclick="copyReferralLink()">Copy Referral Link</button>
+  <div id="referralSystem" style="display:none;">
+    <h3>Your Referral Link:</h3>
+    <p id="referralLink"></p>
+    <button class="button" onclick="copyReferralLink()">Copy Referral Link</button>
+    <h3>Referral Bonus</h3>
+    <p>If someone uses your referral link, you'll earn <strong>50 points</strong>.</p>
+  </div>
 
-  <h3>Referral Bonus</h3>
-  <p>If someone uses your referral link, you'll earn <strong>50 points</strong>.</p>
+  <div id="walletConnect" style="display:none;">
+    <h3>Wallet Connect</h3>
+    <button class="button" onclick="connectWallet()">Connect Wallet</button>
+  </div>
 
-  <h3>Wallet Connect</h3>
-  <button class="button" onclick="connectWallet()">Connect Wallet</button>
+  <div id="airdrop" style="display:none;">
+    <h3>Airdrop</h3>
+    <p>Coming Soon...</p>
+  </div>
 
-  <h3>Withdrawal</h3>
-  <button class="button disabled" id="withdrawButton" onclick="withdraw()">Withdraw (Disabled)</button>
-
-  <p id="status"></p>
+  <div class="nav-bar">
+    <button onclick="showHome()">Home</button>
+    <button onclick="showReferralSystem()">Referral</button>
+    <button onclick="showWalletConnect()">Wallet Connect</button>
+    <button onclick="showAirdrop()">Airdrop</button>
+  </div>
 
   <script>
     let points = 0;
     let referralBonus = 50;
-    let isWithdrawalEnabled = false;  // Withdraw functionality is off by default
+    let isWithdrawalEnabled = false; 
 
     // Set unique user ID (in a real scenario, this would be dynamic, e.g., from login session)
-    let userId = "USER" + Math.floor(Math.random() * 100000);  // Generate a random user ID for this example
+    let userId = "USER" + Math.floor(Math.random() * 100000); 
 
     // Generate a referral link based on the unique user ID
     let referralLink = `https://yourapp.com/?ref=${userId}`;
-
-    // Display the referral link for the user
     document.getElementById('referralLink').innerText = referralLink;
 
     function tapButton() {
       points++;
       document.getElementById('points').innerText = 'Points: ' + points;
-
-      // Send data back to Telegram
-      if (window.Telegram.WebApp) {
-        window.Telegram.WebApp.sendData(`Points: ${points}`);
-      }
     }
 
     function copyReferralLink() {
-      // Copy the referral link to the clipboard
       navigator.clipboard.writeText(referralLink).then(function() {
         alert('Referral link copied to clipboard!');
       }).catch(function(error) {
@@ -84,31 +105,40 @@
     }
 
     function connectWallet() {
-      // Placeholder for wallet connect functionality
       alert('Wallet connected!');
-
-      // Enable withdrawal after wallet is connected
       isWithdrawalEnabled = true;
-      document.getElementById('withdrawButton').classList.remove('disabled');
-      document.getElementById('status').innerText = 'Wallet connected. Withdrawal is now enabled.';
     }
 
-    function withdraw() {
-      if (!isWithdrawalEnabled) {
-        alert('Withdrawal is currently disabled.');
-      } else {
-        // Placeholder for withdrawal functionality
-        alert('Withdrawal functionality is currently unavailable.');
-      }
+    function showHome() {
+      document.getElementById('referralSystem').style.display = 'none';
+      document.getElementById('walletConnect').style.display = 'none';
+      document.getElementById('airdrop').style.display = 'none';
+      document.querySelector('button[onclick="tapButton()"]').style.display = 'inline-block';
     }
 
-    // To handle Web App behavior
-    window.onload = function () {
-      if (window.Telegram && window.Telegram.WebApp) {
-        window.Telegram.WebApp.init();
-        document.body.style.display = 'block'; // Show content after initialization
-      }
-    };
+    function showReferralSystem() {
+      document.getElementById('referralSystem').style.display = 'block';
+      document.getElementById('walletConnect').style.display = 'none';
+      document.getElementById('airdrop').style.display = 'none';
+      document.querySelector('button[onclick="tapButton()"]').style.display = 'none';
+    }
+
+    function showWalletConnect() {
+      document.getElementById('referralSystem').style.display = 'none';
+      document.getElementById('walletConnect').style.display = 'block';
+      document.getElementById('airdrop').style.display = 'none';
+      document.querySelector('button[onclick="tapButton()"]').style.display = 'none';
+    }
+
+    function showAirdrop() {
+      document.getElementById('referralSystem').style.display = 'none';
+      document.getElementById('walletConnect').style.display = 'none';
+      document.getElementById('airdrop').style.display = 'block';
+      document.querySelector('button[onclick="tapButton()"]').style.display = 'none';
+    }
+
+    // Default display: Home screen
+    showHome();
   </script>
 </body>
 </html>

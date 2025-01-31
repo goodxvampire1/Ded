@@ -1,0 +1,57 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Telegram Web App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    .button {
+      padding: 10px 20px;
+      font-size: 18px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .button:active {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <h1>Welcome to the Telegram Web App!</h1>
+  <p>Tap the button below to earn points.</p>
+  <button class="button" onclick="tapButton()">Tap to earn points!</button>
+
+  <p id="points">Points: 0</p>
+
+  <script>
+    let points = 0;
+
+    function tapButton() {
+      points++;
+      document.getElementById('points').innerText = 'Points: ' + points;
+
+      // Send data back to Telegram
+      if (window.Telegram.WebApp) {
+        window.Telegram.WebApp.sendData(`Points: ${points}`);
+      }
+    }
+
+    // To handle Web App behavior
+    window.onload = function () {
+      if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.init();
+        document.body.style.display = 'block'; // Show content after initialization
+      }
+    };
+  </script>
+</body>
+</html>

@@ -32,10 +32,6 @@
     .button:active {
       background-color: #388e3c;
     }
-    .button.disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-    }
     .circle-button {
       width: 120px;
       height: 120px;
@@ -62,9 +58,10 @@
       bottom: 0;
       width: 100%;
       display: flex;
-      justify-content: space-around;
+      justify-content: space-evenly;
       background-color: #34495e;
       padding: 10px 0;
+      border-top: 1px solid #2c3e50;
     }
     .nav-bar button {
       background-color: #2c3e50;
@@ -81,6 +78,12 @@
     #errorMessage {
       color: red;
       display: none;
+    }
+    #walletConnect {
+      margin-top: 20px;
+    }
+    #withdrawButton {
+      margin-top: 20px;
     }
   </style>
 </head>
@@ -102,8 +105,8 @@
   </div>
 
   <div id="walletConnect" style="display:none;">
-    <h3>Wallet Connect</h3>
-    <button class="button" onclick="connectWallet()">Connect Wallet</button>
+    <h3>Connect Telegram Wallet</h3>
+    <button class="button" onclick="connectWallet()">Connect Wallet via Telegram Bot</button>
     <button class="button disabled" id="withdrawButton" onclick="withdrawPoints()" disabled>Withdraw Points</button>
   </div>
 

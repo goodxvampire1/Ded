@@ -57,9 +57,9 @@
     .nav-bar {
       position: fixed;
       bottom: 0;
-      left: 0;  /* Align to the left */
+      left: 0;
       display: flex;
-      justify-content: flex-start; /* Align buttons to the left */
+      justify-content: flex-start;
       padding: 10px;
       background-color: #34495e;
       width: auto;
@@ -71,8 +71,8 @@
       border: none;
       padding: 15px;
       cursor: pointer;
-      border-radius: 50%; /* Make buttons circular */
-      margin-right: 10px; /* Space out the buttons */
+      border-radius: 50%;
+      margin-right: 10px;
       transition: background-color 0.3s;
     }
     .nav-bar button:hover {
@@ -93,6 +93,9 @@
     }
     #referralLink {
       display: none;
+    }
+    #spinButton {
+      margin-top: 20px;
     }
   </style>
 </head>
@@ -124,11 +127,18 @@
     <p>Coming Soon...</p>
   </div>
 
+  <div id="spinSystem" style="display:none;">
+    <h3>Spin for NL Coin</h3>
+    <button class="button" id="spinButton" onclick="spin()">Spin</button>
+    <p id="spinResult"></p>
+  </div>
+
   <div class="nav-bar">
     <button onclick="showHome()">Home</button>
     <button onclick="showReferralSystem()">Referral</button>
     <button onclick="showWalletConnect()">Wallet Connect</button>
     <button onclick="showAirdrop()">Airdrop</button>
+    <button onclick="showSpinSystem()">Spin</button>
   </div>
 
   <script>
@@ -174,10 +184,19 @@
       }
     }
 
+    function spin() {
+      let randomCoin = Math.random() < 0.5 ? 10000 : 0;  // 50% chance to win 10000 NL Coin
+      nlCoin += randomCoin;
+      document.getElementById('spinResult').innerText = randomCoin === 10000 ? "You won 10000 NL Coin!" : "You won 0 NL Coin!";
+      updateCoinDisplay();
+      setTimeout(() => document.getElementById('spinResult').innerText = '', 3000); // Reset after 3 seconds
+    }
+
     function showHome() {
       document.getElementById('referralSystem').style.display = 'none';
       document.getElementById('walletConnect').style.display = 'none';
       document.getElementById('airdrop').style.display = 'none';
+      document.getElementById('spinSystem').style.display = 'none';
       document.querySelector('button[onclick="tapButton()"]').style.display = 'inline-block';
     }
 
@@ -185,6 +204,7 @@
       document.getElementById('referralSystem').style.display = 'block';
       document.getElementById('walletConnect').style.display = 'none';
       document.getElementById('airdrop').style.display = 'none';
+      document.getElementById('spinSystem').style.display = 'none';
       document.querySelector('button[onclick="tapButton()"]').style.display = 'none';
     }
 
@@ -192,6 +212,7 @@
       document.getElementById('referralSystem').style.display = 'none';
       document.getElementById('walletConnect').style.display = 'block';
       document.getElementById('airdrop').style.display = 'none';
+      document.getElementById('spinSystem').style.display = 'none';
       document.querySelector('button[onclick="tapButton()"]').style.display = 'none';
     }
 
@@ -199,6 +220,15 @@
       document.getElementById('referralSystem').style.display = 'none';
       document.getElementById('walletConnect').style.display = 'none';
       document.getElementById('airdrop').style.display = 'block';
+      document.getElementById('spinSystem').style.display = 'none';
+      document.querySelector('button[onclick="tapButton()"]').style.display = 'none';
+    }
+
+    function showSpinSystem() {
+      document.getElementById('referralSystem').style.display = 'none';
+      document.getElementById('walletConnect').style.display = 'none';
+      document.getElementById('airdrop').style.display = 'none';
+      document.getElementById('spinSystem').style.display = 'block';
       document.querySelector('button[onclick="tapButton()"]').style.display = 'none';
     }
 

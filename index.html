@@ -97,6 +97,24 @@
     #spinButton {
       margin-top: 20px;
     }
+    .menu {
+      display: flex;
+      justify-content: flex-end;
+      padding: 10px;
+      font-size: 24px;
+      cursor: pointer;
+    }
+    .menu div {
+      margin-left: 10px;
+      border: 2px solid #34495e;
+      border-radius: 50%;
+      padding: 5px;
+      transition: background-color 0.3s;
+    }
+    .menu div:hover {
+      background-color: #34495e;
+      color: white;
+    }
   </style>
 </head>
 <body>
@@ -110,7 +128,7 @@
 
   <div id="referralSystem" style="display:none;">
     <h3>Your Referral Link:</h3>
-    <p id="referralLink">https://yourapp.com/?ref=USER12345</p>
+    <p id="referralLink">https://goodxvampire.com/(USER12345)</p>
     <button class="button" onclick="copyReferralLink()">Copy Referral Link</button>
     <h3>Referral Bonus</h3>
     <p>If someone uses your referral link, you'll earn <strong>50 NL Coin</strong>.</p>
@@ -142,12 +160,17 @@
     <button onclick="showSpinSystem()">Spin</button>
   </div>
 
+  <div class="menu">
+    <div onclick="showSpinSystem()">...</div>
+    <div onclick="showReferralSystem()">Referral</div>
+  </div>
+
   <script>
     let nlCoin = localStorage.getItem('nlCoin') ? parseInt(localStorage.getItem('nlCoin')) : 0;
     let referralBonus = 50;
     let isWalletConnected = false;
     let userId = "USER" + Math.floor(Math.random() * 100000);
-    let referralLink = `https://yourapp.com/?ref=${userId}`;
+    let referralLink = `https://goodxvampire.com/(${userId})`;
     document.getElementById('referralLink').innerText = referralLink;
 
     // Spin-related variables

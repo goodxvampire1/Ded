@@ -1,194 +1,141 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Ball Game (Levels & Restart)</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <style>
-        body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
-        #scoreBoard {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: rgba(0, 0, 0, 0.6);
-            color: white;
-            padding: 10px;
-            font-size: 18px;
-            border-radius: 5px;
-        }
-        #gameOver {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 36px;
-            color: red;
-            background: black;
-            padding: 20px;
-            border-radius: 10px;
-            display: none;
-        }
-        #restartBtn {
-            position: absolute;
-            top: 60%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 24px;
-            color: white;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            display: none;
-        }
-    </style>
-</head>
-<body>
-    <div id="scoreBoard">Score: <span id="score">0</span> | Level: <span id="level">1</span></div>
-    <div id="gameOver">🔥 GAME OVER! 🔥</div>
-    <button id="restartBtn">Restart Game</button>
+<!-- Removed the second ball part and used the coin for score -->
+<script>
+    // Scene creation
+    const scene = new THREE.Scene();
 
-    <script>
-        // Scene তৈরি করা
-        const scene = new THREE.Scene();
+    // Camera setup
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 5;
 
-        // Camera সেটআপ করা
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.z = 5;
+    // Renderer setup
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
 
-        // Renderer তৈরি করা
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
+    // Ball creation
+    const ballGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+    const ballMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00, metalness: 0.6, roughness: 0.3 });
+    const ball = new THREE.Mesh(ballGeometry, ballMaterial);
+    ball.position.y = -1;
+    scene.add(ball);
 
-        // Ball তৈরি করা
-        const ballGeometry = new THREE.SphereGeometry(0.5, 32, 32);
-        const ballMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00, metalness: 0.6, roughness: 0.3 });
-        const ball = new THREE.Mesh(ballGeometry, ballMaterial);
-        ball.position.y = -1;
-        scene.add(ball);
+    // Fire creation (Game Over object)
+    const fireGeometry = new THREE.BoxGeometry(0.6, 0.6, 0.6);
+    const fireMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+    const fire = new THREE.Mesh(fireGeometry, fireMaterial);
+    fire.position.set(Math.random() * 4 - 2, Math.random() * 4 - 2, 0);
+    scene.add(fire);
 
-        // Fire তৈরি করা (Game Over Object)
-        const fireGeometry = new THREE.BoxGeometry(0.6, 0.6, 0.6);
-        const fireMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-        const fire = new THREE.Mesh(fireGeometry, fireMaterial);
-        fire.position.set(Math.random() * 4 - 2, Math.random() * 4 - 2, 0);
-        scene.add(fire);
+    // Coin creation (Score object)
+    const coinGeometry = new THREE.SphereGeometry(0.3, 16, 16);
+    const coinMaterial = new THREE.MeshStandardMaterial({ color: 0xffff00, metalness: 0.8, roughness: 0.1 });
+    const coin = new THREE.Mesh(coinGeometry, coinMaterial);
+    coin.position.set(Math.random() * 4 - 2, Math.random() * 4 - 2, 0);
+    scene.add(coin);
 
-        // Coin তৈরি করা (Score Object)
-        const coinGeometry = new THREE.SphereGeometry(0.3, 16, 16);
-        const coinMaterial = new THREE.MeshStandardMaterial({ color: 0xffff00, metalness: 0.8, roughness: 0.1 });
-        const coin = new THREE.Mesh(coinGeometry, coinMaterial);
-        coin.position.set(Math.random() * 4 - 2, Math.random() * 4 - 2, 0);
-        scene.add(coin);
+    // Light setup
+    const light = new THREE.PointLight(0xffffff, 1.5);
+    light.position.set(3, 3, 5);
+    scene.add(light);
+    scene.add(new THREE.AmbientLight(0x555555));
 
-        // Light যোগ করা
-        const light = new THREE.PointLight(0xffffff, 1.5);
-        light.position.set(3, 3, 5);
-        scene.add(light);
-        scene.add(new THREE.AmbientLight(0x555555));
+    // Ball movement variables
+    let speedX = 0, speedY = 0;
+    let score = 0;
+    let level = 1;
+    let gameOver = false;
 
-        // Ball movement variables
-        let speedX = 0, speedY = 0;
-        let score = 0;
-        let level = 1;
-        let gameOver = false;
-
-        // Level speed increment
-        function updateLevel() {
-            if (score >= 10 && level === 1) {
-                level = 2;
-                speedX = 0.08;
-                speedY = 0.08;
-                document.getElementById("level").innerText = level;
-            }
-            if (score >= 20 && level === 2) {
-                level = 3;
-                speedX = 0.1;
-                speedY = 0.1;
-                document.getElementById("level").innerText = level;
-            }
-        }
-
-        // Animation Function
-        function animate() {
-            if (gameOver) return;
-
-            requestAnimationFrame(animate);
-
-            // বলের ঘূর্ণন
-            ball.rotation.x += 0.02;
-            ball.rotation.y += 0.02;
-
-            // বল মুভ করা
-            ball.position.x += speedX;
-            ball.position.y += speedY;
-
-            // **Collision Detection (Fire - Game Over)**
-            if (ball.position.distanceTo(fire.position) < 0.6) {
-                gameOver = true;
-                document.getElementById("gameOver").style.display = "block";
-                document.getElementById("restartBtn").style.display = "inline-block";
-                return; // Stop game
-            }
-
-            // **Collision Detection (Coin - Score++)**
-            if (ball.position.distanceTo(coin.position) < 0.6) {
-                score++;
-                document.getElementById("score").innerText = score;
-                coin.position.set(Math.random() * 4 - 2, Math.random() * 4 - 2, 0); // নতুন কয়েন স্পন
-                updateLevel(); // চেক করে লেভেল আপডেট
-            }
-
-            renderer.render(scene, camera);
-        }
-        animate();
-
-        // **Keyboard Control (⬅️⬆️⬇️➡️)**
-        window.addEventListener("keydown", (event) => {
-            if (event.key === "ArrowRight") speedX = 0.05;
-            if (event.key === "ArrowLeft") speedX = -0.05;
-            if (event.key === "ArrowUp") speedY = 0.05;
-            if (event.key === "ArrowDown") speedY = -0.05;
-        });
-
-        // **Stop Moving when Key Released**
-        window.addEventListener("keyup", () => {
-            speedX = 0;
-            speedY = 0;
-        });
-
-        // **Touch Control (Random Movement)**
-        window.addEventListener("touchstart", () => {
-            speedX = (Math.random() - 0.5) * 0.1;
-            speedY = (Math.random() - 0.5) * 0.1;
-        });
-
-        // **Restart Game**
-        document.getElementById("restartBtn").addEventListener("click", () => {
-            gameOver = false;
-            score = 0;
-            level = 1;
-            speedX = 0.05;
-            speedY = 0.05;
-            ball.position.set(0, -1, 0);
-            fire.position.set(Math.random() * 4 - 2, Math.random() * 4 - 2, 0);
-            coin.position.set(Math.random() * 4 - 2, Math.random() * 4 - 2, 0);
-            document.getElementById("score").innerText = score;
+    // Level speed increment
+    function updateLevel() {
+        if (score >= 10 && level === 1) {
+            level = 2;
+            speedX = 0.08;
+            speedY = 0.08;
             document.getElementById("level").innerText = level;
-            document.getElementById("gameOver").style.display = "none";
-            document.getElementById("restartBtn").style.display = "none";
-            animate();
-        });
+        }
+        if (score >= 20 && level === 2) {
+            level = 3;
+            speedX = 0.1;
+            speedY = 0.1;
+            document.getElementById("level").innerText = level;
+        }
+    }
 
-        // **Resize Event**
-        window.addEventListener("resize", () => {
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-        });
-    </script>
-</body>
-</html>
+    // Animation function
+    function animate() {
+        if (gameOver) return;
+
+        requestAnimationFrame(animate);
+
+        // Ball rotation
+        ball.rotation.x += 0.02;
+        ball.rotation.y += 0.02;
+
+        // Ball movement
+        ball.position.x += speedX;
+        ball.position.y += speedY;
+
+        // Collision Detection (Fire - Game Over)
+        if (ball.position.distanceTo(fire.position) < 0.6) {
+            gameOver = true;
+            document.getElementById("gameOver").style.display = "block";
+            document.getElementById("restartBtn").style.display = "inline-block";
+            return; // Stop game
+        }
+
+        // Collision Detection (Coin - Score++)
+        if (ball.position.distanceTo(coin.position) < 0.6) {
+            score++;
+            document.getElementById("score").innerText = score;
+            coin.position.set(Math.random() * 4 - 2, Math.random() * 4 - 2, 0); // New coin spawn
+            updateLevel(); // Update level if needed
+        }
+
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    // Keyboard control (⬅️⬆️⬇️➡️)
+    window.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowRight") speedX = 0.05;
+        if (event.key === "ArrowLeft") speedX = -0.05;
+        if (event.key === "ArrowUp") speedY = 0.05;
+        if (event.key === "ArrowDown") speedY = -0.05;
+    });
+
+    // Stop moving when key is released
+    window.addEventListener("keyup", () => {
+        speedX = 0;
+        speedY = 0;
+    });
+
+    // Touch control (Random movement)
+    window.addEventListener("touchstart", () => {
+        speedX = (Math.random() - 0.5) * 0.1;
+        speedY = (Math.random() - 0.5) * 0.1;
+    });
+
+    // Restart game
+    document.getElementById("restartBtn").addEventListener("click", () => {
+        gameOver = false;
+        score = 0;
+        level = 1;
+        speedX = 0.05;
+        speedY = 0.05;
+        ball.position.set(0, -1, 0);
+        fire.position.set(Math.random() * 4 - 2, Math.random() * 4 - 2, 0);
+        coin.position.set(Math.random() * 4 - 2, Math.random() * 4 - 2, 0);
+        document.getElementById("score").innerText = score;
+        document.getElementById("level").innerText = level;
+        document.getElementById("gameOver").style.display = "none";
+        document.getElementById("restartBtn").style.display = "none";
+        animate();
+    });
+
+    // Resize event
+    window.addEventListener("resize", () => {
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+    });
+</script>
